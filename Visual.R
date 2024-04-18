@@ -19,7 +19,7 @@ SingplePlayer
 
 ## Different cars
 Difcars <- ggplot(data=Mdata, mapping = aes(x=Round, y=`Completion Time(s)`,color=`Race Name`)) + 
-  geom_point(size = 3, alpha=0.6)+s
+  geom_point(size = 3, alpha=0.6)+
   facet_grid( ~ `Vehicle`)
 Difcars
 
