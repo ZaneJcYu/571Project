@@ -1,0 +1,94 @@
+---
+title: "ANOVA"
+author: "Jincheng Yu"
+date: "2024-04-23"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r,echo=T}
+Mdata <- read.csv('Mario Kart Data - Merged.csv')
+colnames(Mdata) <- c('Round', 'Race', 'Race Name', 'Vehicle', 'Type(C/B)', 'Place', 
+                     'Completion Time', 'Player', 'Completion Time(s)')
+Mdata$Round <- as.factor(Mdata$Round)
+Mdata$Race <- ordered(as.factor(Mdata$Race))
+```
+Here, I tried to make the Race as an ordered categorical data.
+
+
+### Check if there's round effect in the game
+```{r,echo=T}
+round_aov <- aov(`Completion Time(s)` ~ Round, data=Mdata)
+summary(round_aov)
+```
+The result shows that there's no significant difference only considering the round and the player effect
+
+
+### Check if there's race # effect in the game
+```{r,echo=T}
+race_no_aov <- aov(`Completion Time(s)` ~ Race, data=Mdata)
+summary(race_no_aov)
+summary(lm(race_no_aov))
+```
+The result shows that race number has significant effect, this is intuitive.
+
+*Comment*
+* Here the baseline is race 18. So positive means the time significant higher than race 18. race 18 is MC
+* When we treat time series as round, the difference is between round is not significant but if we treat single race as a ordered categorical data, then the series effect exist.
+* When we look into the ordered categorical result, it shows that race 1-6 have no significant improvement but in 7-9 positive effect appears and so did in race 11. With time going by we can see concentration goes down and negative effect shows up. But meanwhile there's improvement in the tail. But then we can look into each race significant effect.
+  * 7, 9, 11, 15, 17 ~ RR, MMM, RR, MMM, RR. These race makes the time goes down.
+  * 14, 16 ~ RR, MMM. These race makes the time goes up.
+  * Maybe the race RR and MMM is more difficult or easier?
+
+
+```{r,echo=T}
+race_no_aov <- aov(`Completion Time(s)` ~ `Race Name`, data=Mdata)
+summary(race_no_aov)
+summary(lm(race_no_aov))
+```
+MMM and RR seems easier.
+
+
+### Consider the player effect
+```{r,echo=T}
+race_no_aov <- aov(`Completion Time(s)` ~ Round + Player, data=Mdata)
+summary(race_no_aov)
+summary(lm(race_no_aov))
+```
+When consider the player effect, the completion time still not relavant to the round. But we can see due to the experience, Sungmin played not well in the test.
+
+### Check race# and player effect
+```{r,echo=T}
+race_no_aov <- aov(`Completion Time(s)` ~ Race + Player, data=Mdata)
+summary(race_no_aov)
+summary(lm(race_no_aov))
+```
+
+* The conclusion is similar to before, but more race shows significant effect.
+  * 4, 7, 9, 11, 15, 17 ~ MMM, RR, MMM, RR, MMM, RR. These race makes the time goes down.
+  * 13, 14, 16 ~ MC, RR, MMM. These race makes the time goes up.
+
+
+### Check the whole model
+```{r,echo=T}
+whole_aov <- aov(`Completion Time(s)` ~ Round + Vehicle + `Race Name` + Player, data=Mdata)
+summary(whole_aov)
+```
+
+
+### Interaction between cars and blocks
+```{r,echo=T}
+whole_inter_aov <- aov(`Completion Time(s)` ~ Vehicle * (as.factor(Round) + Player + `Race Name`), data=Mdata)
+summary(whole_inter_aov)
+```
+The interaction is not significant but the `Player` and `Race Nmae` play a role in the response variable.
+
+
+
+
+
+
+
